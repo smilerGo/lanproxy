@@ -7,19 +7,21 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import com.google.gson.reflect.TypeToken;
 import org.fengfei.lanproxy.common.Config;
 import org.fengfei.lanproxy.common.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.reflect.TypeToken;
 
 /**
  * server config
@@ -28,25 +30,24 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 public class ProxyConfig implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(ProxyConfig.class);
 
     private static final long serialVersionUID = 1L;
 
-    /** 配置文件为config.json */
-    public static final String CONFIG_FILE;
-
-    private static Logger logger = LoggerFactory.getLogger(ProxyConfig.class);
-
-    static {
-
+    private static final Supplier<String> DEFAULT_CONFIG_FILE = () -> {
         // 代理配置信息存放在用户根目录下
-        String dataPath = System.getProperty("user.home") + "/" + ".lanproxy/";
-        File file = new File(dataPath);
-        if (!file.isDirectory()) {
-            file.mkdir();
+        Path dataPath =  Paths.get(System.getProperty("user.home")).resolve(".lanproxy/");;
+        File file = dataPath.toFile();
+        if (file.isDirectory() && file.mkdirs()) {
+            logger.info("配置文件处理完成,配置文件: {}", file.getAbsolutePath());
+            return dataPath.resolve("/config.json").toString();
         }
 
-        CONFIG_FILE = dataPath + "/config.json";
-    }
+        throw new RuntimeException("配置文件处理失败!");
+
+    };
+    /** 配置文件为config.json */
+    public static final String CONFIG_FILE = DEFAULT_CONFIG_FILE.get();
 
     /** 代理服务器绑定主机host */
     private String serverBind;
@@ -177,7 +178,7 @@ public class ProxyConfig implements Serializable {
             throw new RuntimeException(e);
         }
 
-        List<Client> clients = JsonUtil.json2object(proxyMappingConfigJson, new TypeToken<List<Client>>() {
+        List<Client> clients = JsonUtil.json2Object(proxyMappingConfigJson, new TypeToken<List<Client>>() {
         });
         if (clients == null) {
             clients = new ArrayList<Client>();
@@ -405,8 +406,11 @@ public class ProxyConfig implements Serializable {
      * @author fengfei
      *
      */
-    public static interface ConfigChangedListener {
+    public interface ConfigChangedListener {
 
+        /**
+         * 配置更新
+         */
         void onChanged();
     }
 }

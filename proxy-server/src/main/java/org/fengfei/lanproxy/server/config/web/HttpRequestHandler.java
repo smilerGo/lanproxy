@@ -46,7 +46,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ResponseInfo responseInfo = ApiRoute.run(request);
 
         // 错误码规则：除100取整为http状态码
-        outputContent(ctx, request, responseInfo.getCode() / 100, JsonUtil.object2json(responseInfo),
+        outputContent(ctx, request, responseInfo.getCode() / 100, JsonUtil.object2Json(responseInfo),
                 "Application/json;charset=utf-8");
     }
 

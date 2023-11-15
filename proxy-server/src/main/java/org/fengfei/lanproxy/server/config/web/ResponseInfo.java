@@ -2,13 +2,19 @@ package org.fengfei.lanproxy.server.config.web;
 
 import java.io.Serializable;
 
+/**
+ * <p>
+ * 响应信息基础结构
+ * </p>
+ * 
+ */
 public class ResponseInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     public static final int CODE_OK = 20000;
 
-    public static final int CODE_INVILID_PARAMS = 40000;
+    public static final int CODE_INVALID_PARAMS = 40000;
 
     public static final int CODE_UNAUTHORIZED = 40100;
 

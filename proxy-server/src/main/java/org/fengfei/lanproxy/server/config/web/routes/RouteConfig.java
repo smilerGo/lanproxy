@@ -101,17 +101,17 @@ public class RouteConfig {
                 byte[] buf = new byte[request.content().readableBytes()];
                 request.content().readBytes(buf);
                 String config = new String(buf, Charset.forName("UTF-8"));
-                List<Client> clients = JsonUtil.json2object(config, new TypeToken<List<Client>>() {
+                List<Client> clients = JsonUtil.json2Object(config, new TypeToken<List<Client>>() {
                 });
                 if (clients == null) {
-                    return ResponseInfo.build(ResponseInfo.CODE_INVILID_PARAMS, "Error json config");
+                    return ResponseInfo.build(ResponseInfo.CODE_INVALID_PARAMS, "Error json config");
                 }
 
                 try {
                     ProxyConfig.getInstance().update(config);
                 } catch (Exception ex) {
                     logger.error("config update error", ex);
-                    return ResponseInfo.build(ResponseInfo.CODE_INVILID_PARAMS, ex.getMessage());
+                    return ResponseInfo.build(ResponseInfo.CODE_INVALID_PARAMS, ex.getMessage());
                 }
 
                 return ResponseInfo.build(ResponseInfo.CODE_OK, "success");
@@ -125,16 +125,16 @@ public class RouteConfig {
                 byte[] buf = new byte[request.content().readableBytes()];
                 request.content().readBytes(buf);
                 String config = new String(buf);
-                Map<String, String> loginParams = JsonUtil.json2object(config, new TypeToken<Map<String, String>>() {
+                Map<String, String> loginParams = JsonUtil.json2Object(config, new TypeToken<Map<String, String>>() {
                 });
                 if (loginParams == null) {
-                    return ResponseInfo.build(ResponseInfo.CODE_INVILID_PARAMS, "Error login info");
+                    return ResponseInfo.build(ResponseInfo.CODE_INVALID_PARAMS, "Error login info");
                 }
 
                 String username = loginParams.get("username");
                 String password = loginParams.get("password");
                 if (username == null || password == null) {
-                    return ResponseInfo.build(ResponseInfo.CODE_INVILID_PARAMS, "Error username or password");
+                    return ResponseInfo.build(ResponseInfo.CODE_INVALID_PARAMS, "Error username or password");
                 }
 
                 if (username.equals(ProxyConfig.getInstance().getConfigAdminUsername()) && password.equals(ProxyConfig.getInstance().getConfigAdminPassword())) {
@@ -142,7 +142,7 @@ public class RouteConfig {
                     return ResponseInfo.build(token);
                 }
 
-                return ResponseInfo.build(ResponseInfo.CODE_INVILID_PARAMS, "Error username or password");
+                return ResponseInfo.build(ResponseInfo.CODE_INVALID_PARAMS, "Error username or password");
             }
         });
 
